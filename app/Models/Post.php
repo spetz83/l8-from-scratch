@@ -14,11 +14,13 @@ class Post
         public $date,
         public $body,
         public $slug,
-    ) {}
+    )
+    {
+    }
 
     public static function all()
     {
-        return cache()->rememberForever('posts.all', function() {
+        return cache()->rememberForever('posts.all', function () {
             return collect(File::files(resource_path("posts")))
                 ->map(fn($file) => YamlFrontMatter::parseFile($file))
                 ->map(fn($document) => new Post(
@@ -34,5 +36,16 @@ class Post
     public static function find($slug)
     {
         return static::all()->firstWhere('slug', $slug);
+    }
+
+    public static function findOrFail($slug)
+    {
+        $post = self::find($slug);
+
+        if (!$post) {
+            throw new ModelNotFoundException();
+        }
+
+        return $post;
     }
 }
