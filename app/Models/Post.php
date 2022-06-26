@@ -18,6 +18,15 @@ class Post extends Model
         'published_at',
     ];
 
+    public function scopeFilter($query, array $filters)
+    {
+        if($filters['search'] ?? false) {
+            $query
+                ->where('title', 'like', '%' . \request('search') . '%')
+                ->orWhere('body', 'like', '%' . \request('search') . '%');
+        }
+    }
+
     public function category(): BelongsTo
     {
         return $this->belongsTo(Category::class);
